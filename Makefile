@@ -1,6 +1,6 @@
 USER := "postgres_user"
 PASSWORD := "superStrongPassword"
-HOST := "localhost"
+HOST := "database"
 PORT := "5432"
 DB_NAME := "diploma"
 
