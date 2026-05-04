@@ -3,7 +3,9 @@ package postgres
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/url"
+	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -25,6 +27,11 @@ func buildPostgresURL(host, port, user, password, dbname string) string {
 
 func RunMigrations(host, port, user, password, dbname string) error {
 	dsn := buildPostgresURL(host, port, user, password, dbname)
+
+	if !FolderExists("file://./migrations") {
+		log.Println("Migrations folder not found")
+	}
+
 	m, err := migrate.New(
 		"file://./migrations",
 		dsn,
@@ -39,4 +46,12 @@ func RunMigrations(host, port, user, password, dbname string) error {
 	}
 
 	return nil
+}
+
+func FolderExists(path string) bool {
+	info, err := os.Stat(path)
+	if err == nil {
+		return info.IsDir()
+	}
+	return false
 }

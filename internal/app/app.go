@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/TwiLightDM/diploma-gateway/internal/config"
-	"github.com/TwiLightDM/diploma-gateway/internal/grpc/course-service"
-	"github.com/TwiLightDM/diploma-gateway/internal/grpc/user-service"
+	course_service "github.com/TwiLightDM/diploma-gateway/internal/grpc/course-service"
+	user_service "github.com/TwiLightDM/diploma-gateway/internal/grpc/user-service"
 	"github.com/TwiLightDM/diploma-gateway/internal/handlers"
 	"github.com/TwiLightDM/diploma-gateway/internal/middlewares"
 	"github.com/TwiLightDM/diploma-gateway/internal/services"
@@ -23,7 +23,11 @@ import (
 
 func Run(cfg *config.Config) error {
 	err := postgres.RunMigrations(cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.Username, cfg.Postgres.Password, cfg.Postgres.Database)
+
+	log.Println("Running migrations on ", cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.Username, cfg.Postgres.Password, cfg.Postgres.Database)
+
 	if err != nil {
+		log.Fatal(err)
 		return err
 	}
 
