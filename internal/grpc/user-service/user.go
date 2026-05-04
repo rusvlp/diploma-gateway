@@ -35,11 +35,22 @@ func (c *UserClient) ReadUser(ctx context.Context, id string) (*userservicepb.Re
 	})
 }
 
+func (c *UserClient) ReadUsers(ctx context.Context) (*userservicepb.ReadUsersResponse, error) {
+	return c.user.ReadUsers(ctx, &userservicepb.ReadUsersRequest{})
+}
+
 func (c *UserClient) UpdateUser(ctx context.Context, id, fullName, email string) (*userservicepb.UpdateUserResponse, error) {
 	return c.user.UpdateUser(ctx, &userservicepb.UpdateUserRequest{
 		Id:       id,
 		FullName: fullName,
 		Email:    email,
+	})
+}
+
+func (c *UserClient) UpdateUserRole(ctx context.Context, id, role string) (*userservicepb.UpdateUserRoleResponse, error) {
+	return c.user.UpdateUserRole(ctx, &userservicepb.UpdateUserRoleRequest{
+		Id:   id,
+		Role: role,
 	})
 }
 

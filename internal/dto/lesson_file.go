@@ -13,5 +13,5 @@ type LessonFileResponse struct {
 }
 
 type LessonFileListResponse struct {
-	LessonFiles []LessonFileResponse `json:"lesson_files"`
+	LessonFiles []LessonFileResponse `json:"files"`
 }

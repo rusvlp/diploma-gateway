@@ -130,6 +130,35 @@ func (h *UserHandler) ReadUser(c echo.Context) error {
 	})
 }
 
+func (h *UserHandler) ReadAllUser(c echo.Context) error {
+	role := c.Get("role").(string)
+	if role != "admin" {
+		return c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "you need to be an admin"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	response, err := h.userClient.ReadUsers(ctx)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+	}
+
+	users := make([]dto.UserResponse, 0, len(response.Users))
+	for _, user := range response.Users {
+		users = append(users, dto.UserResponse{
+			Id:       user.Id,
+			FullName: user.FullName,
+			Role:     user.Role,
+			Email:    user.Email,
+		})
+	}
+
+	return c.JSON(http.StatusOK, dto.UserListResponse{
+		Users: users,
+	})
+}
+
 func (h *UserHandler) ReadSelf(c echo.Context) error {
 	id := c.Get("user_id").(string)
 	if id == "" {
@@ -198,5 +227,32 @@ func (h *UserHandler) ChangePassword(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.UserResponse{})
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *UserHandler) UpdateUserRole(c echo.Context) error {
+	var request dto.UserRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
+	}
+
+	role := c.Get("role").(string)
+	if role != "admin" {
+		return c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "you need to be an admin"})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	response, err := h.userClient.UpdateUserRole(ctx, request.UserId, request.Role)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, dto.UserResponse{
+		Id:       response.User.Id,
+		FullName: response.User.FullName,
+		Role:     response.User.Role,
+		Email:    response.User.Email,
+	})
 }

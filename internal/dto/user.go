@@ -4,6 +4,8 @@ type UserRequest struct {
 	FullName string `json:"full_name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
+	UserId   string `json:"user_id"`
 }
 
 type LoginResponse struct {
@@ -22,4 +24,8 @@ type UserResponse struct {
 	FullName string `json:"full_name"`
 	Role     string `json:"role"`
 	Email    string `json:"email"`
+}
+
+type UserListResponse struct {
+	Users []UserResponse `json:"users"`
 }

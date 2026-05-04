@@ -10,6 +10,7 @@ services:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
 
   minio:
     image: minio/minio:latest
