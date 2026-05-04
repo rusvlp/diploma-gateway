@@ -11,5 +11,19 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server ${MINIO_DATA_DIR} --console-address ":${MINIO_CONSOLE_PORT}"
+    env_file:
+      - .env
+    ports:
+      - "${MINIO_API_PORT}:${MINIO_API_PORT}"
+      - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
+    volumes:
+      - minio_data:${MINIO_DATA_DIR}
+    restart: unless-stopped
+
 volumes:
   pgdata:
+  minio_data:

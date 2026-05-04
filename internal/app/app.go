@@ -39,6 +39,7 @@ func Run(cfg *config.Config) error {
 	courseHandler := handlers.NewCourseHandler(courseClient)
 	moduleHandler := handlers.NewModuleHandler(courseClient)
 	lessonHandler := handlers.NewLessonHandler(courseClient)
+	lessonFileHandler := handlers.NewLessonFileHandler(courseClient)
 	groupCourseHandler := handlers.NewGroupCourseHandler(courseClient)
 
 	defer func() {
@@ -46,7 +47,7 @@ func Run(cfg *config.Config) error {
 		_ = userClient.Close()
 	}()
 
-	registerRoutes(e, authMiddleware, userHandler, groupHandler, groupMemberHandler, courseHandler, moduleHandler, lessonHandler, groupCourseHandler)
+	registerRoutes(e, authMiddleware, userHandler, groupHandler, groupMemberHandler, courseHandler, moduleHandler, lessonHandler, lessonFileHandler, groupCourseHandler)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.GatewayPort,
@@ -89,6 +90,7 @@ func registerRoutes(e *echo.Echo,
 	courseHandler *handlers.CourseHandler,
 	moduleHandler *handlers.ModuleHandler,
 	lessonHandler *handlers.LessonHandler,
+	lessonFileHandler *handlers.LessonFileHandler,
 	groupCourseHandler *handlers.GroupCourseHandler,
 ) {
 	public := e.Group("/auth")
@@ -131,10 +133,6 @@ func registerRoutes(e *echo.Echo,
 	courses.DELETE("/:id", courseHandler.DeleteCourse)
 	courses.GET("/:id/group-courses", groupCourseHandler.ReadAllGroupCoursesByCourseId)
 
-	groupCourses := e.Group("/group-courses", authMiddleware)
-	groupCourses.POST("", groupCourseHandler.CreateGroupCourse)
-	groupCourses.DELETE("/:id", groupCourseHandler.DeleteGroupCourse)
-
 	modules := e.Group("/modules", authMiddleware)
 	modules.POST("", moduleHandler.CreateModule)
 	modules.GET("/courses/:course_id", moduleHandler.ReadAllModulesByCourseId)
@@ -148,4 +146,13 @@ func registerRoutes(e *echo.Echo,
 	lessons.GET("/:id", lessonHandler.ReadLesson)
 	lessons.PATCH("/:id", lessonHandler.UpdateLesson)
 	lessons.DELETE("/:id", lessonHandler.DeleteLesson)
+
+	lessonFiles := e.Group("/lessons/files", authMiddleware)
+	lessonFiles.POST("", lessonFileHandler.UploadFile)
+	lessonFiles.GET("/:lesson_id", lessonFileHandler.GetFiles)
+	lessonFiles.DELETE("/:id", lessonFileHandler.DeleteFile)
+
+	groupCourses := e.Group("/group-courses", authMiddleware)
+	groupCourses.POST("", groupCourseHandler.CreateGroupCourse)
+	groupCourses.DELETE("/:id", groupCourseHandler.DeleteGroupCourse)
 }

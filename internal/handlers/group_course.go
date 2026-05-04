@@ -24,7 +24,7 @@ func (h *GroupMemberHandler) CreateGroupMember(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.userClient.CreateGroupMember(ctx, request.UserId, request.GroupId)
@@ -45,7 +45,7 @@ func (h *GroupMemberHandler) ReadAllGroupMembersByUserId(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.GroupMemberResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.userClient.ReadAllGroupMembersByUserId(ctx, userId)
@@ -73,7 +73,7 @@ func (h *GroupMemberHandler) ReadAllGroupMembersByGroupId(c echo.Context) error 
 		return c.JSON(http.StatusBadRequest, dto.GroupMemberResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.userClient.ReadAllGroupMembersByGroupId(ctx, groupId)
@@ -101,7 +101,7 @@ func (h *GroupMemberHandler) DeleteGroupMember(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.GroupMemberResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	_, err := h.userClient.DeleteGroupMember(ctx, id)
 	if err != nil {

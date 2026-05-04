@@ -5,6 +5,7 @@ import (
 
 	"github.com/TwiLightDM/diploma-course-service/proto/courseservicepb"
 	"github.com/TwiLightDM/diploma-course-service/proto/groupcourseservicepb"
+	"github.com/TwiLightDM/diploma-course-service/proto/lessonfileservicepb"
 	"github.com/TwiLightDM/diploma-course-service/proto/lessonservicepb"
 	"github.com/TwiLightDM/diploma-course-service/proto/moduleservicepb"
 	"google.golang.org/grpc"
@@ -15,6 +16,7 @@ type CourseClient struct {
 	course      courseservicepb.CourseServiceClient
 	module      moduleservicepb.ModuleServiceClient
 	lesson      lessonservicepb.LessonServiceClient
+	lessonFile  lessonfileservicepb.LessonFileServiceClient
 	groupCourse groupcourseservicepb.GroupCourseServiceClient
 	conn        *grpc.ClientConn
 }
@@ -33,6 +35,7 @@ func NewCourseClient(address string) *CourseClient {
 		course:      courseservicepb.NewCourseServiceClient(conn),
 		module:      moduleservicepb.NewModuleServiceClient(conn),
 		lesson:      lessonservicepb.NewLessonServiceClient(conn),
+		lessonFile:  lessonfileservicepb.NewLessonFileServiceClient(conn),
 		groupCourse: groupcourseservicepb.NewGroupCourseServiceClient(conn),
 		conn:        conn,
 	}

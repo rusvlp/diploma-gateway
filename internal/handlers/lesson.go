@@ -26,7 +26,7 @@ func (h *LessonHandler) CreateLesson(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.CreateLesson(ctx, request.Title, request.Description, request.Content, request.ModuleId)
@@ -57,7 +57,7 @@ func (h *LessonHandler) ReadLesson(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadLesson(ctx, id)
@@ -81,7 +81,7 @@ func (h *LessonHandler) ReadAllLessonsByCourseId(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadAllLessonsByModuleId(ctx, moduleId)
@@ -116,7 +116,7 @@ func (h *LessonHandler) UpdateLesson(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.UpdateLesson(ctx, id, request.Title, request.Description, request.Content, request.Position)
@@ -139,7 +139,7 @@ func (h *LessonHandler) DeleteLesson(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	_, err := h.courseClient.DeleteLesson(ctx, id)
 	if err != nil {

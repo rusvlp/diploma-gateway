@@ -28,7 +28,7 @@ func (h *CourseHandler) CreateCourse(c echo.Context) error {
 
 	ownerId := c.Get("user_id").(string)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.CreateCourse(ctx, request.Title, request.Description, request.AccessType, ownerId)
@@ -59,7 +59,7 @@ func (h *CourseHandler) ReadCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadCourse(ctx, id)
@@ -80,7 +80,7 @@ func (h *CourseHandler) ReadCourse(c echo.Context) error {
 }
 
 func (h *CourseHandler) ReadAllCourses(c echo.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadAllCourses(ctx)
@@ -113,7 +113,7 @@ func (h *CourseHandler) ReadAllCoursesByOwnerId(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadAllCoursesByOwnerId(ctx, ownerId)
@@ -151,7 +151,7 @@ func (h *CourseHandler) UpdateCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.UpdateCourse(ctx, id, request.Title, request.Description, request.AccessType)
@@ -175,7 +175,7 @@ func (h *CourseHandler) UpdatePublishedAt(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.UpdatePublishedAt(ctx, id)
@@ -199,7 +199,7 @@ func (h *CourseHandler) DeleteCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	_, err := h.courseClient.DeleteCourse(ctx, id)
 	if err != nil {

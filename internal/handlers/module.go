@@ -26,7 +26,7 @@ func (h *ModuleHandler) CreateModule(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.CreateModule(ctx, request.Title, request.Description, request.CourseId)
@@ -56,7 +56,7 @@ func (h *ModuleHandler) ReadModule(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadModule(ctx, id)
@@ -80,7 +80,7 @@ func (h *ModuleHandler) ReadAllModulesByCourseId(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadAllModulesByCourseId(ctx, courseId)
@@ -116,7 +116,7 @@ func (h *ModuleHandler) UpdateModule(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.UpdateModule(ctx, id, request.Title, request.Description, request.Position)
@@ -139,7 +139,7 @@ func (h *ModuleHandler) DeleteModule(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	_, err := h.courseClient.DeleteModule(ctx, id)
 	if err != nil {

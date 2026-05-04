@@ -24,7 +24,7 @@ func (h *GroupHandler) CreateGroup(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.userClient.CreateGroup(ctx, request.Title, request.Description, request.OwnerId)
@@ -46,7 +46,7 @@ func (h *GroupHandler) ReadGroup(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.GroupResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.userClient.ReadGroup(ctx, id)
@@ -68,7 +68,7 @@ func (h *GroupHandler) ReadAllGroupsByOwnerId(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.GroupResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.userClient.ReadAllGroupsByOwnerId(ctx, ownerId)
@@ -102,7 +102,7 @@ func (h *GroupHandler) UpdateGroup(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.GroupResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.userClient.UpdateGroup(ctx, id, request.Title, request.Description)
@@ -124,7 +124,7 @@ func (h *GroupHandler) DeleteGroup(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.GroupResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	_, err := h.userClient.DeleteGroup(ctx, id)
 	if err != nil {

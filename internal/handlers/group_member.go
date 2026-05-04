@@ -24,7 +24,7 @@ func (h *GroupCourseHandler) CreateGroupCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.CreateGroupCourse(ctx, request.CourseId, request.GroupId)
@@ -45,7 +45,7 @@ func (h *GroupCourseHandler) ReadAllGroupCoursesByCourseId(c echo.Context) error
 		return c.JSON(http.StatusBadRequest, dto.GroupCourseResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadAllGroupCoursesByCourseId(ctx, courseId)
@@ -73,7 +73,7 @@ func (h *GroupCourseHandler) ReadAllGroupCoursesByGroupId(c echo.Context) error 
 		return c.JSON(http.StatusBadRequest, dto.GroupCourseResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	response, err := h.courseClient.ReadAllGroupCoursesByGroupId(ctx, groupId)
@@ -101,7 +101,7 @@ func (h *GroupCourseHandler) DeleteGroupCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.GroupCourseResponse{Error: "invalid request"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	_, err := h.courseClient.DeleteGroupCourse(ctx, id)
 	if err != nil {
