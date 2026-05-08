@@ -8,6 +8,8 @@ import (
 	"github.com/TwiLightDM/diploma-gateway/internal/dto"
 	"github.com/TwiLightDM/diploma-gateway/internal/grpc/user-service"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type UserHandler struct {
@@ -16,6 +18,26 @@ type UserHandler struct {
 
 func NewUserHandler(userClient *user_service.UserClient) *UserHandler {
 	return &UserHandler{userClient: userClient}
+}
+
+func grpcErr(c echo.Context, err error) error {
+	st, _ := status.FromError(err)
+	var httpCode int
+	switch st.Code() {
+	case codes.InvalidArgument:
+		httpCode = http.StatusBadRequest
+	case codes.AlreadyExists:
+		httpCode = http.StatusConflict
+	case codes.NotFound:
+		httpCode = http.StatusNotFound
+	case codes.Unauthenticated:
+		httpCode = http.StatusUnauthorized
+	case codes.PermissionDenied:
+		httpCode = http.StatusForbidden
+	default:
+		httpCode = http.StatusInternalServerError
+	}
+	return c.JSON(httpCode, dto.ErrorResponse{Error: st.Message()})
 }
 
 func (h *UserHandler) Login(c echo.Context) error {
@@ -29,7 +51,7 @@ func (h *UserHandler) Login(c echo.Context) error {
 
 	response, err := h.userClient.Login(ctx, request.Email, request.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.LoginResponse{
@@ -49,7 +71,7 @@ func (h *UserHandler) SignUp(c echo.Context) error {
 
 	response, err := h.userClient.SignUp(ctx, request.FullName, "student", request.Email, request.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.SignUpResponse{
@@ -75,7 +97,7 @@ func (h *UserHandler) CreateTeacher(c echo.Context) error {
 
 	response, err := h.userClient.SignUp(ctx, request.FullName, "teacher", request.Email, request.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.SignUpResponse{
@@ -99,7 +121,7 @@ func (h *UserHandler) Refresh(c echo.Context) error {
 
 	response, err := h.userClient.Refresh(ctx, id, role)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.LoginResponse{
@@ -119,7 +141,7 @@ func (h *UserHandler) ReadUser(c echo.Context) error {
 
 	response, err := h.userClient.ReadUser(ctx, id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.UserResponse{
@@ -141,7 +163,7 @@ func (h *UserHandler) ReadAllUser(c echo.Context) error {
 
 	response, err := h.userClient.ReadUsers(ctx)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	users := make([]dto.UserResponse, 0, len(response.Users))
@@ -170,7 +192,7 @@ func (h *UserHandler) ReadSelf(c echo.Context) error {
 
 	response, err := h.userClient.ReadUser(ctx, id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.UserResponse{
@@ -197,7 +219,7 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 
 	response, err := h.userClient.UpdateUser(ctx, id, request.FullName, request.Email)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.UserResponse{
@@ -224,7 +246,7 @@ func (h *UserHandler) ChangePassword(c echo.Context) error {
 
 	_, err := h.userClient.ChangePassword(ctx, id, request.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -246,7 +268,7 @@ func (h *UserHandler) UpdateUserRole(c echo.Context) error {
 
 	response, err := h.userClient.UpdateUserRole(ctx, request.UserId, request.Role)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		return grpcErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, dto.UserResponse{

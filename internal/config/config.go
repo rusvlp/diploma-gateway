@@ -16,10 +16,11 @@ type Config struct {
 		Database string
 	}
 
-	GatewayPort    string
-	UserGRPCAddr   string
-	CourseGRPCAddr string
-	JWTSecret      string
+	GatewayPort     string
+	UserGRPCAddr    string
+	CourseGRPCAddr  string
+	TerrainGRPCAddr string
+	JWTSecret       string
 }
 
 func Load() *Config {
@@ -38,6 +39,7 @@ func Load() *Config {
 	cfg.GatewayPort = os.Getenv("GATEWAY_PORT")
 	cfg.UserGRPCAddr = os.Getenv("USER_GRPC_ADDR")
 	cfg.CourseGRPCAddr = os.Getenv("COURSE_GRPC_ADDR")
+	cfg.TerrainGRPCAddr = os.Getenv("TERRAIN_GRPC_ADDR")
 	cfg.JWTSecret = os.Getenv("JWT_SECRET")
 
 	return cfg

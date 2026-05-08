@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/TwiLightDM/diploma-gateway/internal/config"
 	course_service "github.com/TwiLightDM/diploma-gateway/internal/grpc/course-service"
+	terrain_service "github.com/TwiLightDM/diploma-gateway/internal/grpc/terrain-service"
 	user_service "github.com/TwiLightDM/diploma-gateway/internal/grpc/user-service"
 	"github.com/TwiLightDM/diploma-gateway/internal/handlers"
 	"github.com/TwiLightDM/diploma-gateway/internal/middlewares"
@@ -21,14 +23,17 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+func migrationsPath() string {
+	if p := os.Getenv("MIGRATIONS_PATH"); p != "" {
+		return p
+	}
+	return "./migrations"
+}
+
 func Run(cfg *config.Config) error {
-	err := postgres.RunMigrations(cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.Username, cfg.Postgres.Password, cfg.Postgres.Database)
-
-	log.Println("Running migrations on ", cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.Username, cfg.Postgres.Password, cfg.Postgres.Database)
-
+	err := postgres.RunMigrations(migrationsPath(), cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.Username, cfg.Postgres.Password, cfg.Postgres.Database)
 	if err != nil {
-		log.Fatal(err)
-		return err
+		return fmt.Errorf("migrations: %w", err)
 	}
 
 	e := echo.New()
@@ -52,12 +57,16 @@ func Run(cfg *config.Config) error {
 	lessonFileHandler := handlers.NewLessonFileHandler(courseClient)
 	groupCourseHandler := handlers.NewGroupCourseHandler(courseClient)
 
+	terrainClient := terrain_service.NewTerrainClient(cfg.TerrainGRPCAddr)
+	terrainHandler := handlers.NewTerrainHandler(terrainClient)
+
 	defer func() {
-		log.Println("Closing gRPC connection to user service")
+		log.Println("Closing gRPC connections")
 		_ = userClient.Close()
+		_ = terrainClient.Close()
 	}()
 
-	registerRoutes(e, authMiddleware, userHandler, groupHandler, groupMemberHandler, courseHandler, moduleHandler, lessonHandler, lessonFileHandler, groupCourseHandler)
+	registerRoutes(e, authMiddleware, userHandler, groupHandler, groupMemberHandler, courseHandler, moduleHandler, lessonHandler, lessonFileHandler, groupCourseHandler, terrainHandler)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.GatewayPort,
@@ -102,6 +111,7 @@ func registerRoutes(e *echo.Echo,
 	lessonHandler *handlers.LessonHandler,
 	lessonFileHandler *handlers.LessonFileHandler,
 	groupCourseHandler *handlers.GroupCourseHandler,
+	terrainHandler *handlers.TerrainHandler,
 ) {
 	public := e.Group("/auth")
 	public.POST("/login", userHandler.Login)
@@ -167,4 +177,11 @@ func registerRoutes(e *echo.Echo,
 	groupCourses := e.Group("/group-courses", authMiddleware)
 	groupCourses.POST("", groupCourseHandler.CreateGroupCourse)
 	groupCourses.DELETE("/:id", groupCourseHandler.DeleteGroupCourse)
+
+	terrain := e.Group("/terrain", authMiddleware)
+	terrain.POST("/jobs", terrainHandler.SubmitJob)
+	terrain.GET("/jobs", terrainHandler.GetHistory)
+	terrain.GET("/jobs/:id", terrainHandler.GetJobStatus)
+	terrain.GET("/limit", terrainHandler.GetMyLimit)
+	terrain.PATCH("/limit", terrainHandler.SetLimit)
 }

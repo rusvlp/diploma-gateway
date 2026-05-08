@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -25,33 +26,50 @@ func buildPostgresURL(host, port, user, password, dbname string) string {
 	return u.String()
 }
 
-func RunMigrations(host, port, user, password, dbname string) error {
+func RunMigrations(migrationsPath, host, port, user, password, dbname string) error {
+	log.Printf("[migrations] path=%s  db=%s@%s:%s/%s", migrationsPath, user, host, port, dbname)
+
+	if !folderExists(migrationsPath) {
+		return fmt.Errorf("migrations folder not found: %s", migrationsPath)
+	}
+
 	dsn := buildPostgresURL(host, port, user, password, dbname)
+	source := "file://" + migrationsPath
 
-	if !FolderExists("file://./migrations") {
-		log.Println("Migrations folder not found")
+	const maxAttempts = 10
+	var m *migrate.Migrate
+	var err error
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		m, err = migrate.New(source, dsn)
+		if err == nil {
+			break
+		}
+		wait := time.Duration(attempt) * 2 * time.Second
+		log.Printf("[migrations] attempt %d/%d failed to connect: %v — retrying in %s", attempt, maxAttempts, err, wait)
+		time.Sleep(wait)
 	}
-
-	m, err := migrate.New(
-		"file://./migrations",
-		dsn,
-	)
 	if err != nil {
-		return err
+		return fmt.Errorf("[migrations] could not connect after %d attempts: %w", maxAttempts, err)
 	}
+	defer m.Close()
+
+	log.Println("[migrations] applying...")
 
 	err = m.Up()
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return err
+	if errors.Is(err, migrate.ErrNoChange) {
+		log.Println("[migrations] already up to date")
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("[migrations] failed: %w", err)
 	}
 
+	log.Println("[migrations] done")
 	return nil
 }
 
-func FolderExists(path string) bool {
+func folderExists(path string) bool {
 	info, err := os.Stat(path)
-	if err == nil {
-		return info.IsDir()
-	}
-	return false
+	return err == nil && info.IsDir()
 }

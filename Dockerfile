@@ -1,9 +1,9 @@
-from golang:1.26-bookworm
+FROM golang:1.26-bookworm
 
-workdir app
+WORKDIR /app
 
 COPY . .
 
-run go mod download
+ENV MIGRATIONS_PATH=/app/migrations
 
-cmd ["go", "run", "main.go"]
+CMD ["go", "run", "-mod=vendor", "main.go"]
